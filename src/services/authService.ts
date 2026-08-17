@@ -49,12 +49,13 @@ export async function loginAdmin(identifier: string, password: string, res: Resp
     { expiresIn: "12h" }
   );
 
-  res.cookie("admin_token", token, {
-    httpOnly: true,
-    secure: NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 12 * 60 * 60 * 1000, // 12 hours
-  });
+ res.cookie("admin_token", token, {
+  httpOnly: true,
+  secure: NODE_ENV === "production",
+  sameSite: NODE_ENV === "production" ? "none" : "lax",
+  path: "/",
+  maxAge: 12 * 60 * 60 * 1000, // 12 hours
+});
 
   return {
     admin: {
@@ -71,6 +72,7 @@ export function logoutAdmin(res: Response) {
   res.clearCookie("admin_token", {
     httpOnly: true,
     secure: NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: NODE_ENV === "production" ? "none" : "lax",
+    path: "/",
   });
 }

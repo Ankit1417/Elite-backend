@@ -11,6 +11,9 @@ export type OrderStatus =
 export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED";
 export type PaymentMethod = "COD" | "ESEWA";
 
+export type ReviewStatus = "published" | "hidden" | "rejected";
+export type ReviewSort = "newest" | "highest" | "lowest";
+
 export interface ICustomerPayload {
   role: "customer";
   customerId: string;

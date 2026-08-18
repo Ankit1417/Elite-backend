@@ -309,3 +309,42 @@ export async function deleteBook(id: string) {
   await book.deleteOne();
   return true;
 }
+
+export async function getRelatedBooks(identifier: string, limit = 6) {
+  let targetBook = null;
+  if (identifier.match(/^[0-9a-fA-F]{24}$/)) {
+    targetBook = await Book.findById(identifier);
+  }
+  if (!targetBook) {
+    targetBook = await Book.findOne({ slug: identifier });
+  }
+
+  if (!targetBook) {
+    throw new AppError("Book not found", 404);
+  }
+
+  const categoryBooks = await Book.find({
+    _id: { $ne: targetBook._id },
+    category: targetBook.category,
+    isActive: true,
+  })
+    .populate("category", "name slug")
+    .limit(limit);
+
+  if (categoryBooks.length >= limit) {
+    return categoryBooks;
+  }
+
+  const existingIds = [targetBook._id, ...categoryBooks.map((b) => b._id)];
+  const fallbackLimit = limit - categoryBooks.length;
+
+  const fallbackBooks = await Book.find({
+    _id: { $nin: existingIds },
+    isActive: true,
+  })
+    .populate("category", "name slug")
+    .sort({ isFeatured: -1, stockQuantity: -1, createdAt: -1 })
+    .limit(fallbackLimit);
+
+  return [...categoryBooks, ...fallbackBooks];
+}

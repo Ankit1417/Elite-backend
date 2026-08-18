@@ -9,6 +9,7 @@ export interface ICustomer extends Document {
   birthdayOffersEnabled: boolean;
   birthdayUpdatedAt?: Date;
   birthdayPromptDismissedAt?: Date;
+  wishlist: mongoose.Types.ObjectId[];
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -51,6 +52,12 @@ const CustomerSchema = new Schema<ICustomer>(
     birthdayPromptDismissedAt: {
       type: Date,
     },
+    wishlist: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Book",
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,

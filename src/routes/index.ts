@@ -11,6 +11,8 @@ import homepageRoutes from "./homepageRoutes.js";
 import dealRoutes from "./dealRoutes.js";
 import notificationRoutes from "./notificationRoutes.js";
 import issuedCouponRoutes from "./issuedCouponRoutes.js";
+import wishlistRoutes from "./wishlistRoutes.js";
+import reviewRoutes from "./reviewRoutes.js";
 
 const router = Router();
 
@@ -26,5 +28,7 @@ router.use("/payment", paymentSettingsRoutes);
 router.use("/homepage", homepageRoutes);
 router.use("/notifications", notificationRoutes);
 router.use("/coupons", issuedCouponRoutes);
+router.use("/wishlist", wishlistRoutes);
+router.use("/reviews", reviewRoutes);
 
 export default router;

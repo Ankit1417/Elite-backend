@@ -5,6 +5,7 @@ import {
   getBookById,
   getBookBySlug,
   getBooks,
+  getRelatedBooks,
   updateBook,
 } from "../services/bookService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -48,6 +49,15 @@ export const handleGetBookById = asyncHandler(
     const includeInactive = req.query.includeInactive === "true";
     const book = await getBookById(id, includeInactive);
     return sendSuccess(res, book);
+  }
+);
+
+export const handleGetRelatedBooks = asyncHandler(
+  async (req: Request, res: Response) => {
+    const id = String(req.params.id);
+    const limit = req.query.limit ? Number(req.query.limit) : 6;
+    const books = await getRelatedBooks(id, limit);
+    return sendSuccess(res, { books });
   }
 );
 

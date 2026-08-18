@@ -24,6 +24,8 @@ export interface IBook extends Document {
   isBestSeller: boolean;
   isNewArrival: boolean;
   isActive: boolean;
+  averageRating: number;
+  reviewCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -135,6 +137,17 @@ const BookSchema = new Schema<IBook>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    averageRating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+    reviewCount: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
   },
   {

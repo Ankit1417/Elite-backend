@@ -99,7 +99,7 @@ export const handleCustomerSignup = asyncHandler(
     res.cookie(CUSTOMER_COOKIE_NAME, token, {
       httpOnly: true,
       secure: NODE_ENV === "production",
-      sameSite: NODE_ENV === "production" ? "strict" : "lax",
+      sameSite: NODE_ENV === "production" ? "none" : "lax",
       maxAge: COOKIE_MAX_AGE,
       path: "/",
     });
@@ -158,7 +158,7 @@ export const handleCustomerLogin = asyncHandler(
     res.cookie(CUSTOMER_COOKIE_NAME, token, {
       httpOnly: true,
       secure: NODE_ENV === "production",
-      sameSite: NODE_ENV === "production" ? "strict" : "lax",
+      sameSite: NODE_ENV === "production" ? "none" : "lax",
       maxAge: COOKIE_MAX_AGE,
       path: "/",
     });
@@ -179,7 +179,7 @@ export const handleCustomerLogout = asyncHandler(
     res.clearCookie(CUSTOMER_COOKIE_NAME, {
       httpOnly: true,
       secure: NODE_ENV === "production",
-      sameSite: NODE_ENV === "production" ? "strict" : "lax",
+      sameSite: NODE_ENV === "production" ? "none" : "lax",
       path: "/",
     });
     return sendSuccess(res, null, 200, "Logged out successfully");

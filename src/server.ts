@@ -5,7 +5,7 @@ import {
   connectDatabase,
   disconnectDatabase,
 } from "./config/database.js";
-import { MONGODB_URI, PORT, NODE_ENV } from "./config/env.js";
+import { MONGODB_URI, PORT, NODE_ENV, logEnvironmentDiagnostics } from "./config/env.js";
 import { testCloudinaryAuth } from "./config/cloudinary.js";
 import { startBirthdayScheduler } from "./services/birthdaySchedulerService.js";
 
@@ -66,6 +66,7 @@ async function shutdown(signal: NodeJS.Signals, server: Server): Promise<void> {
 }
 
 async function startServer(): Promise<void> {
+  logEnvironmentDiagnostics();
   await connectDatabase();
   const server = await startHttpServer();
   stopBirthdayScheduler = startBirthdayScheduler();

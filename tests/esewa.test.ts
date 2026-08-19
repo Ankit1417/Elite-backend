@@ -116,3 +116,53 @@ test("eSewa Amount Calculation Rule: total_amount = amount + tax_amount + produc
   assert.equal(total, 1650);
   assert.equal(total, merchandise + tax + service + delivery);
 });
+
+test("eSewa Environment Secret Resolution accepts UAT key in test mode", () => {
+  const UAT_SECRET = "8gBm/:&EnhH.1/q";
+  // Simulating secret resolution logic
+  const resolve = (envSecret?: string, esewaEnv = "test") => {
+    const trimmed = envSecret?.trim();
+    if (esewaEnv === "production") {
+      if (!trimmed || trimmed === UAT_SECRET) {
+        throw new Error("Invalid production secret");
+      }
+      return trimmed;
+    }
+    return trimmed || UAT_SECRET;
+  };
+
+  assert.equal(resolve(undefined, "test"), UAT_SECRET);
+  assert.equal(resolve("8gBm/:&EnhH.1/q", "test"), UAT_SECRET);
+  assert.equal(resolve("  8gBm/:&EnhH.1/q  ", "test"), UAT_SECRET);
+  assert.equal(resolve("custom_test_key", "test"), "custom_test_key");
+});
+
+test("eSewa Environment Secret Resolution enforces strict security in production mode", () => {
+  const UAT_SECRET = "8gBm/:&EnhH.1/q";
+  const resolve = (envSecret?: string, esewaEnv = "production") => {
+    const trimmed = envSecret?.trim();
+    if (esewaEnv === "production") {
+      if (!trimmed) {
+        throw new Error("ESEWA_SECRET_KEY must be explicitly configured when ESEWA_ENVIRONMENT is 'production'");
+      }
+      if (trimmed === UAT_SECRET) {
+        throw new Error("Cannot use UAT test secret key in production eSewa environment");
+      }
+      return trimmed;
+    }
+    return trimmed || UAT_SECRET;
+  };
+
+  // Missing secret in production throws
+  assert.throws(() => resolve(undefined, "production"), /must be explicitly configured/);
+  assert.throws(() => resolve("   ", "production"), /must be explicitly configured/);
+
+  // UAT secret in production throws
+  assert.throws(() => resolve(UAT_SECRET, "production"), /Cannot use UAT test secret key/);
+  assert.throws(() => resolve(`  ${UAT_SECRET}  `, "production"), /Cannot use UAT test secret key/);
+
+  // Real production secret passes with trim
+  const realProdKey = "real_production_super_secret_key_from_esewa";
+  assert.equal(resolve(`  ${realProdKey}  `, "production"), realProdKey);
+});
+

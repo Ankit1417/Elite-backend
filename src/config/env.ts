@@ -127,3 +127,27 @@ export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET ?? "";
 export const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? DEFAULT_ADMIN_EMAIL;
 export const ADMIN_PHONE = process.env.ADMIN_PHONE ?? "";
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? DEFAULT_ADMIN_PASSWORD;
+
+// eSewa ePay V2 Configuration
+const DEFAULT_ESEWA_ENVIRONMENT = "test";
+const DEFAULT_ESEWA_PRODUCT_CODE = "EPAYTEST";
+const DEFAULT_ESEWA_SECRET_KEY = "8gBm/:&EnhH.1/q";
+const DEFAULT_ESEWA_PAYMENT_URL = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
+const DEFAULT_ESEWA_STATUS_URL = "https://rc.esewa.com.np/api/epay/transaction/status/";
+
+export const ESEWA_ENVIRONMENT = (process.env.ESEWA_ENVIRONMENT ?? DEFAULT_ESEWA_ENVIRONMENT).toLowerCase();
+export const ESEWA_PRODUCT_CODE = process.env.ESEWA_PRODUCT_CODE ?? DEFAULT_ESEWA_PRODUCT_CODE;
+
+const configuredEsewaSecretKey = process.env.ESEWA_SECRET_KEY ?? DEFAULT_ESEWA_SECRET_KEY;
+if (NODE_ENV === "production" && (configuredEsewaSecretKey === DEFAULT_ESEWA_SECRET_KEY || !process.env.ESEWA_SECRET_KEY)) {
+  throw new Error("ESEWA_SECRET_KEY must be explicitly configured in production");
+}
+export const ESEWA_SECRET_KEY = configuredEsewaSecretKey;
+
+export const ESEWA_PAYMENT_URL = process.env.ESEWA_PAYMENT_URL ?? DEFAULT_ESEWA_PAYMENT_URL;
+export const ESEWA_STATUS_URL = process.env.ESEWA_STATUS_URL ?? DEFAULT_ESEWA_STATUS_URL;
+
+const backendBaseUrl = `http://localhost:${PORT}/api`;
+export const ESEWA_SUCCESS_URL = process.env.ESEWA_SUCCESS_URL ?? `${backendBaseUrl}/payments/esewa/success`;
+export const ESEWA_FAILURE_URL = process.env.ESEWA_FAILURE_URL ?? `${backendBaseUrl}/payments/esewa/failure`;
+

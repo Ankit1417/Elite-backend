@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "lint": "tsc --noEmit",
-    "test": "node --import tsx --test --test-concurrency=1 tests/features.test.ts",
+    "test": "node --import tsx --test --test-concurrency=1 tests/features.test.ts tests/esewa.test.ts",
     "build": "tsc",
     "seed": "tsx src/scripts/seed.ts",
     "start": "node dist/server.js"

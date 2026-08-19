@@ -12,14 +12,13 @@ import { AppError } from "../utils/appError.js";
  */
 const REVIEWABLE_ORDER_STATUS = "DELIVERED";
 
-export const REVIEW_MIN_COMMENT = 10;
 export const REVIEW_MAX_COMMENT = 2000;
 export const REVIEW_MAX_TITLE = 120;
 
 interface CreateReviewInput {
   rating: number;
   title?: string;
-  comment: string;
+  comment?: string;
 }
 
 interface UpdateReviewInput {
@@ -57,16 +56,11 @@ function validateRating(rating: unknown): number {
 }
 
 function validateComment(comment: unknown): string {
-  if (typeof comment !== "string" || !comment.trim()) {
-    throw new AppError("Review comment is required", 400);
+  if (comment === undefined || comment === null) return "";
+  if (typeof comment !== "string") {
+    throw new AppError("Review comment must be a string", 400);
   }
   const trimmed = comment.trim();
-  if (trimmed.length < REVIEW_MIN_COMMENT) {
-    throw new AppError(
-      `Review must contain at least ${REVIEW_MIN_COMMENT} characters`,
-      400
-    );
-  }
   if (trimmed.length > REVIEW_MAX_COMMENT) {
     throw new AppError(
       `Review must be ${REVIEW_MAX_COMMENT} characters or fewer`,
@@ -212,20 +206,17 @@ export async function getCustomerReviewStatus(
   const bookExists = await Book.exists({ _id: bookId });
   if (!bookExists) throw new AppError("Book not found", 404);
 
-  const [qualifyingOrder, existingReview] = await Promise.all([
-    findCompletedOrderForBook(customerId, bookId),
-    Review.findOne({ book: bookId, customer: customerId }),
-  ]);
+  const existingReview = await Review.findOne({ book: bookId, customer: customerId });
 
   return {
     authenticated: true,
-    eligible: Boolean(qualifyingOrder),
+    eligible: true,
     hasReviewed: Boolean(existingReview),
     review: existingReview ?? null,
   };
 }
 
-/** Create a review. Verified-purchase + one-per-customer enforced backend-side. */
+/** Create a review. Any authenticated customer can review; verified purchase is marked if delivered order exists. */
 export async function createReview(
   bookId: string,
   customerId: string,
@@ -245,23 +236,18 @@ export async function createReview(
   }
 
   const qualifyingOrder = await findCompletedOrderForBook(customerId, bookId);
-  if (!qualifyingOrder) {
-    throw new AppError(
-      "You can review this book only after your order has been completed.",
-      403
-    );
-  }
+  const isVerifiedPurchase = Boolean(qualifyingOrder);
 
   let review: IReview;
   try {
     review = await Review.create({
       book: bookId,
       customer: customerId,
-      order: qualifyingOrder._id,
+      order: qualifyingOrder?._id,
       rating,
       title,
       comment,
-      isVerifiedPurchase: true,
+      isVerifiedPurchase,
       status: "published",
     });
   } catch (err) {

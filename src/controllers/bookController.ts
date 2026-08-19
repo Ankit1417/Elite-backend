@@ -25,7 +25,7 @@ export const handleGetBooks = asyncHandler(
       isNewArrival: req.query.isNewArrival === "true",
       hasDiscount: req.query.hasDiscount === "true",
       includeInactive: req.query.includeInactive === "true",
-      sort: req.query.sort as "newest" | "price-asc" | "price-desc" | "discount",
+      sort: req.query.sort as "top-rated" | "newest" | "price-asc" | "price-desc" | "discount",
       page: req.query.page ? Number(req.query.page) : 1,
       limit: req.query.limit ? Number(req.query.limit) : 20,
     };

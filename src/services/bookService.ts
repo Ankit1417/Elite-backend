@@ -17,7 +17,7 @@ export interface IBookFilterOptions {
   isNewArrival?: boolean;
   hasDiscount?: boolean;
   includeInactive?: boolean;
-  sort?: "newest" | "price-asc" | "price-desc" | "discount";
+  sort?: "top-rated" | "newest" | "price-asc" | "price-desc" | "discount";
   page?: number;
   limit?: number;
 }
@@ -35,7 +35,7 @@ export async function getBooks(options: IBookFilterOptions) {
     isNewArrival,
     hasDiscount,
     includeInactive = false,
-    sort = "newest",
+    sort = "top-rated",
     page = 1,
     limit = 20,
   } = options;
@@ -87,10 +87,12 @@ export async function getBooks(options: IBookFilterOptions) {
   if (isNewArrival) query.isNewArrival = true;
   if (hasDiscount) query.discountPercentage = { $gt: 0 };
 
-  let sortOption: Record<string, 1 | -1> = { createdAt: -1 };
-  if (sort === "price-asc") sortOption = { finalPrice: 1 };
+  let sortOption: Record<string, 1 | -1> = { averageRating: -1, reviewCount: -1, createdAt: -1 };
+  if (sort === "newest") sortOption = { createdAt: -1 };
+  else if (sort === "price-asc") sortOption = { finalPrice: 1 };
   else if (sort === "price-desc") sortOption = { finalPrice: -1 };
   else if (sort === "discount") sortOption = { discountPercentage: -1 };
+  // sort === "top-rated" uses the default multi-field sort above
 
   const skip = (page - 1) * limit;
 

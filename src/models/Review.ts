@@ -4,10 +4,10 @@ import { ReviewStatus } from "../types/index.js";
 export interface IReview extends Document {
   book: mongoose.Types.ObjectId;
   customer: mongoose.Types.ObjectId;
-  order: mongoose.Types.ObjectId;
+  order?: mongoose.Types.ObjectId;
   rating: number;
   title?: string;
-  comment: string;
+  comment?: string;
   isVerifiedPurchase: boolean;
   status: ReviewStatus;
   createdAt: Date;
@@ -29,7 +29,7 @@ const ReviewSchema = new Schema<IReview>(
     order: {
       type: Schema.Types.ObjectId,
       ref: "Order",
-      required: true,
+      required: false,
     },
     rating: {
       type: Number,
@@ -44,14 +44,14 @@ const ReviewSchema = new Schema<IReview>(
     },
     comment: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
-      minlength: 10,
+      default: "",
       maxlength: 2000,
     },
     isVerifiedPurchase: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     status: {
       type: String,
